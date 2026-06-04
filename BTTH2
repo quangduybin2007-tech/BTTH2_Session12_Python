@@ -1,0 +1,253 @@
+# Khởi tạo dữ liệu mẫu ban đầu
+saving_accounts = [
+    {
+        "account_id": "STK001",
+        "customer_name": "Nguyễn Văn An",
+        "balance": 50000000,
+        "term_months": 6,
+        "interest_rate": 6.5,
+        "status": "active"
+    },
+    {
+        "account_id": "STK002",
+        "customer_name": "Trần Thị Bình",
+        "balance": 120000000,
+        "term_months": 12,
+        "interest_rate": 7.2,
+        "status": "active"
+    }
+]
+
+def find_account(account_id):
+    """Hàm phụ hỗ trợ tìm kiếm tài khoản theo ID (trả về dict hoặc None)"""
+    for account in saving_accounts:
+        if account["account_id"] == account_id:
+            return account
+    return None
+
+def display_accounts():
+    """Chức năng 1: Xem danh sách sổ tiết kiệm"""
+    if not saving_accounts:
+        print("\n--> Danh sách sổ tiết kiệm hiện đang trống.")
+        return
+    
+    print("\nDanh sách sổ tiết kiệm:")
+    for idx, acc in enumerate(saving_accounts, 1):
+        print(f"{idx}. Mã sổ: {acc['account_id']} | "
+              f"Khách hàng: {acc['customer_name']} | "
+              f"Số tiền gửi: {acc['balance']} | "
+              f"Kỳ hạn: {acc['term_months']} tháng | "
+              f"Lãi suất: {acc['interest_rate']}%/năm | "
+              f"Trạng thái: {acc['status']}")
+
+def open_account():
+    """Chức năng 2: Mở sổ tiết kiệm mới"""
+    print("\n--- MỞ SỔ TIẾT KIỆM MỚI ---")
+    
+    # Bẫy 1: Kiểm tra mã sổ trùng
+    account_id = input("Nhập mã sổ tiết kiệm: ").strip().upper()
+    if find_account(account_id):
+        print("--> Mã sổ tiết kiệm đã tồn tại!")
+        return
+
+    # Bẫy 2: Tên khách hàng trống
+    customer_name = input("Nhập tên khách hàng: ").strip()
+    if not customer_name:
+        print("--> Tên khách hàng không được để trống!")
+        return
+
+    # Bẫy 3: Số tiền gửi và kỳ hạn gửi hợp lệ
+    try:
+        balance = int(input("Nhập số tiền gửi: "))
+        term_months = int(input("Nhập kỳ hạn gửi theo tháng: "))
+        if balance <= 0 or term_months <= 0:
+            print("--> Số tiền gửi hoặc kỳ hạn không hợp lệ!")
+            return
+    except ValueError:
+        print("--> Số tiền gửi hoặc kỳ hạn không hợp lệ!")
+        return
+
+    # Bẫy 4: Lãi suất năm hợp lệ
+    try:
+        interest_rate = float(input("Nhập lãi suất năm: "))
+        if interest_rate <= 0:
+            print("--> Lãi suất không hợp lệ!")
+            return
+    except ValueError:
+        print("--> Lãi suất không hợp lệ!")
+        return
+
+    # Thêm dữ liệu lồng (Dictionary mới) vào List hệ thống
+    new_account = {
+        "account_id": account_id,
+        "customer_name": customer_name,
+        "balance": balance,
+        "term_months": term_months,
+        "interest_rate": interest_rate,
+        "status": "active"
+    }
+    saving_accounts.append(new_account)
+    print(f"--> Mở sổ {account_id} thành công!")
+
+def update_account():
+    """Chức năng 3: Cập nhật thông tin sổ tiết kiệm"""
+    print("\n--- CẬP NHẬT THÔNG TIN SỔ ---")
+    account_id = input("Nhập mã sổ tiết kiệm cần cập nhật: ").strip().upper()
+    
+    account = find_account(account_id)
+    # Bẫy 5: Mã không tồn tại
+    if not account:
+        print("--> Không tìm thấy mã sổ tiết kiệm!")
+        return
+    
+    # Bẫy 6: Thao tác trên sổ đã tất toán
+    if account["status"] == "closed":
+        print("--> Không thể cập nhật sổ tiết kiệm đã tất toán!")
+        return
+
+    customer_name = input("Nhập tên khách hàng mới: ").strip()
+    if not customer_name:
+        print("--> Tên khách hàng không được để trống!")
+        return
+
+    try:
+        balance = int(input("Nhập số tiền gửi mới: "))
+        term_months = int(input("Nhập kỳ hạn mới theo tháng: "))
+        if balance <= 0 or term_months <= 0:
+            print("--> Số tiền gửi hoặc kỳ hạn không hợp lệ!")
+            return
+    except ValueError:
+        print("--> Số tiền gửi hoặc kỳ hạn không hợp lệ!")
+        return
+
+    try:
+        interest_rate = float(input("Nhập lãi suất năm mới: "))
+        if interest_rate <= 0:
+            print("--> Lãi suất không hợp lệ!")
+            return
+    except ValueError:
+        print("--> Lãi suất không hợp lệ!")
+        return
+
+    # Tiến hành cập nhật trực tiếp vào các key của dictionary con
+    account["customer_name"] = customer_name
+    account["balance"] = balance
+    account["term_months"] = term_months
+    account["interest_rate"] = interest_rate
+    print(f"--> Cập nhật sổ {account_id} thành công!")
+
+def close_account():
+    """Chức năng 4: Tất toán sổ tiết kiệm"""
+    print("\n--- TẤT TOÁN SỔ TIẾT KIỆM ---")
+    account_id = input("Nhập mã sổ tiết kiệm cần tất toán/xóa: ").strip().upper()
+    
+    account = find_account(account_id)
+    if not account:
+        print("--> Không tìm thấy mã sổ tiết kiệm!")
+        return
+        
+    if account["status"] == "closed":
+        print("--> Sổ tiết kiệm này đã được tất toán trước đó rồi!")
+        return
+
+    # Thay đổi trạng thái
+    account["status"] = "closed"
+    print(f"--> Tất toán sổ {account_id} thành công! (Trạng thái chuyển sang 'closed')")
+
+def calculate_interest():
+    """Chức năng 5: Tính lãi dự kiến khi đến hạn"""
+    print("\n--- TÍNH LÃI DỰ KIẾN ĐẾN HẠN ---")
+    account_id = input("Nhập mã sổ tiết kiệm cần tính lãi: ").strip().upper()
+    
+    account = find_account(account_id)
+    if not account:
+        print("--> Không tìm thấy mã sổ tiết kiệm!")
+        return
+        
+    if account["status"] == "closed":
+        print("--> Không thể thao tác với sổ tiết kiệm đã tất toán!")
+        return
+
+    # Công thức: Tiền lãi = Số tiền gửi * Lãi suất năm / 100 * Kỳ hạn gửi / 12
+    interest = account["balance"] * account["interest_rate"] / 100 * account["term_months"] / 12
+    total_receive = account["balance"] + interest
+    
+    print(f"--> Tiền lãi dự kiến: {interest:,.1f} VND")
+    print(f"--> Tổng tiền nhận khi đến hạn: {total_receive:,.1f} VND")
+
+def check_early_withdrawal():
+    """Chức năng 6: Kiểm tra điều kiện rút trước hạn"""
+    print("\n--- KIỂM TRA RÚT TRƯỚC HẠN ---")
+    account_id = input("Nhập mã sổ tiết kiệm cần kiểm tra: ").strip().upper()
+    
+    account = find_account(account_id)
+    if not account:
+        print("--> Không tìm thấy mã sổ tiết kiệm!")
+        return
+        
+    if account["status"] == "closed":
+        print("--> Không thể thao tác với sổ tiết kiệm đã tất toán!")
+        return
+
+    # Bẫy 7: Số tháng thực gửi không hợp lệ
+    try:
+        months_sent = int(input("Nhập số tháng thực gửi: "))
+        if months_sent <= 0:
+            print("--> Số tháng thực gửi không hợp lệ!")
+            return
+    except ValueError:
+        print("--> Số tháng thực gửi không hợp lệ!")
+        return
+
+    # Áp dụng quy tắc tính lãi suất
+    if months_sent < account["term_months"]:
+        print("--> Trạng thái: Rút trước hạn!")
+        rate_applied = 0.5  # Lãi suất cố định rút trước hạn 0.5%/năm
+    else:
+        print("--> Trạng thái: Đủ điều kiện hưởng lãi đúng hạn!")
+        rate_applied = account["interest_rate"]
+
+    # Công thức tính thực nhận
+    interest_received = account["balance"] * rate_applied / 100 * months_sent / 12
+    total_received = account["balance"] + interest_received
+
+    print(f"--> Lại suất áp dụng: {rate_applied}%/năm")
+    print(f"--> Tiền lãi thực nhận: {interest_received:,.1f} VND")
+    print(f"--> Tổng tiền thực nhận: {total_received:,.1f} VND")
+
+def main():
+    """Hàm chạy chương trình chính hiển thị Menu CLI"""
+    while True:
+        print("\n===== HỆ THỐNG QUẢN LÝ TÀI KHOẢN TIẾT KIỆM TECHBANK =====")
+        print("1. Xem danh sách sổ tiết kiệm")
+        print("2. Mở sổ tiết kiệm mới")
+        print("3. Cập nhật thông tin sổ tiết kiệm")
+        print("4. Tất toán hoặc xóa sổ tiết kiệm")
+        print("5. Tính lãi dự kiến khi đến hạn")
+        print("6. Kiểm tra điều kiện rút trước hạn")
+        print("7. Thoát chương trình")
+        
+        choice = input("Vui lòng nhập lựa chọn của bạn (1-7): ").strip()
+        
+        if choice == "1":
+            display_accounts()
+        elif choice == "2":
+            open_account()
+        elif choice == "3":
+            update_account()
+        elif choice == "4":
+            close_account()
+        elif choice == "5":
+            calculate_interest()
+        elif choice == "6":
+            check_early_withdrawal()
+        elif choice == "7":
+            print("\nCảm ơn bạn đã sử dụng hệ thống TechBank. Tạm biệt!")
+            break
+        else:
+            # Bẫy 8: Menu Validation
+            print("--> Lựa chọn không hợp lệ, vui lòng nhập lại!")
+
+# Chạy chương trình
+if __name__ == "__main__":
+    main()
